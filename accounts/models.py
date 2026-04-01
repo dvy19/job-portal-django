@@ -4,14 +4,14 @@ from django.db import models
 # This manager handles creating regular users and superusers
 class CustomUserManager(BaseUserManager):
 
-    def create_user(self, email, password, role=None, **extra_fields):
+    def create_user(self, email, password, role=None):
 
         if len(password) < 6:
             raise ValueError("Password must be at least 6 characters long")
         if not email:
             raise ValueError("Email is required")
         email = self.normalize_email(email)
-        user = self.model(email=email, role=role, **extra_fields)
+        user = self.model(email=email, role=role)
         user.set_password(password)  # hashes the password
         user.save(using=self._db)
         return user
