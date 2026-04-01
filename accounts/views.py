@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import RegisterSerializer
+from .serializers import LoginSerializer, RegisterSerializer
 
 # Helper function — generates JWT tokens for a given user
 def get_tokens_for_user(user):
@@ -14,6 +14,30 @@ def get_tokens_for_user(user):
         "access":  str(refresh.access_token),
     }
 
+
+
+class LoginView(APIView):
+    permission_classes = [AllowAny]  # no auth needed to login
+
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+
+        if serializer.is_valid():
+            data = serializer.validated_data
+            return Response(
+                {
+                    "message": "Login successful",
+                    "role":    data["role"],
+                    "tokens":  {
+                        "access": data["access"],
+                        "refresh": data["refresh"],
+                    },
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        # If validation fails, return the errors
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]  # no auth needed to register
