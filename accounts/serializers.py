@@ -1,7 +1,8 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser, Qualification
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from .models import JobSeekerProfile, Qualification
 
 class RegisterSerializer(serializers.ModelSerializer):
 
@@ -45,6 +46,29 @@ class LoginSerializer(serializers.Serializer):
             "refresh": str(refresh),
             "role": user.role
         }
+    
+
+class QualificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Qualification
+        fields = '__all__'
+
+
+class JobSeekerProfileSerializer(serializers.ModelSerializer):
+    qualifications = QualificationSerializer(many=True)
+
+    class Meta:
+        model = JobSeekerProfile
+        fields = '__all__'
+
+    def create(self, validated_data):
+        qualifications_data = validated_data.pop('qualifications')
+        profile = JobSeekerProfile.objects.create(**validated_data)
+
+        for qual in qualifications_data:
+            Qualification.objects.create(profile=profile, **qual)
+
+        return profile
 
     
 

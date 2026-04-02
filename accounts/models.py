@@ -46,3 +46,30 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.email} ({self.role})"
+
+
+
+class JobSeekerProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+
+    full_name = models.CharField(max_length=255)
+    gender = models.CharField(max_length=10)
+    date_of_birth = models.DateField()
+
+    college_name = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.full_name
+    
+
+class Qualification(models.Model):
+    profile = models.ForeignKey(JobSeekerProfile, on_delete=models.CASCADE, related_name='qualifications')
+
+    degree = models.CharField(max_length=50)  # 12th, Undergraduate, Postgraduate
+    status = models.CharField(max_length=20)  # Completed / Pursuing
+    year_of_completion = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.degree} - {self.profile.full_name}"
