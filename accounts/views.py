@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
-from .serializers import JobSeekerProfileSerializer, LoginSerializer, RegisterSerializer
+from .serializers import JobSeekerProfileSerializer, LoginSerializer, RecruiterProfileSerializer, RegisterSerializer
 
 # Helper function — generates JWT tokens for a given user
 def get_tokens_for_user(user):
@@ -64,6 +64,17 @@ class RegisterView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 
+class JobRecruiterProfileView(APIView):
+    permission_classes=[IsAuthenticated]
+
+    def post(self, request):
+        serializer=RecruiterProfileSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data)
+        
+        return Response(serializer.errors)
 
 class JobSeekerProfileView(APIView):
     permission_classes = [IsAuthenticated]

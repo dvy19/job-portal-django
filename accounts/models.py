@@ -47,6 +47,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.email} ({self.role})"
 
+class RecruiterProfile(models.Model):
+    user=models.OneToOneField(CustomUser,on_delete=models.CASCADE)
+
+    company_name=models.CharField(max_length=100)
+    full_name=models.CharField(max_length=30)
+    position=models.CharField(max_length=30)
+    city=models.CharField(max_length=30)
+    state=models.CharField(max_length=30)
+    def __str__(self):
+        return self.full_name
 
 
 class JobSeekerProfile(models.Model):

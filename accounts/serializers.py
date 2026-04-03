@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, Qualification
+from .models import CustomUser, Qualification, RecruiterProfile
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import JobSeekerProfile, Qualification
@@ -53,6 +53,16 @@ class QualificationSerializer(serializers.ModelSerializer):
         model = Qualification
         fields = '__all__'
 
+
+class RecruiterProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=RecruiterProfile
+        fields='__all__'
+
+    
+    def create(self,validated_data):
+        profile=RecruiterProfile.objects.create(**validated_data)
+        return profile
 
 class JobSeekerProfileSerializer(serializers.ModelSerializer):
     qualifications = QualificationSerializer(many=True)
