@@ -58,6 +58,8 @@ class RecruiterProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model=RecruiterProfile
         fields='__all__'
+        read_only_fields = ['user'] 
+        
 
     
     def create(self,validated_data):
