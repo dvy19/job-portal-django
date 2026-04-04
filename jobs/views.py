@@ -4,6 +4,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 # Create your views here.
+from django.shortcuts import get_object_or_404
+
+from .models import Post, Comment, Like
+from .serializers import PostSerializer, CommentSerializer
 from rest_framework import status
 from .serializers import JobSerializer
 class JobView(APIView):
@@ -19,4 +23,76 @@ class JobView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
+# 🔥 Create + List Posts
+class PostView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        posts = Post.objects.all().order_by('-created_at')
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = PostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(recruiter=request.user.recruiterprofile)
+            return Response(serializer.data)
+        return Response(serializer.errors)
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+
+from .models import Post, Comment, Like
+from .serializers import PostSerializer, CommentSerializer
+
+
+# 🔥 Single Post
+class PostDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id)
+        serializer = PostSerializer(post)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# 💬 Comment View
+class CommentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id)
+
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user, post=post)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id)
+        comments = post.comments.all().order_by('-created_at')
+
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# ❤️ Like Toggle
+class LikeToggleView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id)
+        user = request.user
+
+        like, created = Like.objects.get_or_create(user=user, post=post)
+
+        if not created:
+            like.delete()
+            return Response({"liked": False}, status=status.HTTP_200_OK)
+
+        return Response({"liked": True}, status=status.HTTP_201_CREATED)
 

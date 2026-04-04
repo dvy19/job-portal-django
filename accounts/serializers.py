@@ -48,10 +48,6 @@ class LoginSerializer(serializers.Serializer):
         }
     
 
-class QualificationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Qualification
-        fields = '__all__'
 
 
 class RecruiterProfileSerializer(serializers.ModelSerializer):
@@ -65,6 +61,12 @@ class RecruiterProfileSerializer(serializers.ModelSerializer):
     def create(self,validated_data):
         profile=RecruiterProfile.objects.create(**validated_data)
         return profile
+
+
+class QualificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Qualification
+        fields = '__all__'
 
 class JobSeekerProfileSerializer(serializers.ModelSerializer):
     qualifications = QualificationSerializer(many=True)
