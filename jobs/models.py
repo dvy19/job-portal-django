@@ -1,59 +1,64 @@
 from django.db import models
 
-# Create your models here.
-
-'''
-difference between auto_now_add and auto_now
--created_first and created_first
-'''
 class Job(models.Model):
 
-    user=models.ForeignKey("accounts.RecruiterProfile", related_name='posts', on_delete=models.CASCADE)
+    user = models.ForeignKey("accounts.RecruiterProfile", related_name="jobs", on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    description = models.TextField(default="No Description Available")
+    location = models.CharField(max_length=100)
+    stipend = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Job stipend in currency units")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-    title=models.CharField(max_length=100)
-    description=models.TextField(default="No Description Available")
-    location=models.CharField(max_length=100)
-    '''
-    can store values up to 99,999,999.99 (10 digits total, 2 after decimal).
-    Default is 0.00.
-    '''
-    stipend=models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    created_at=models.DateTimeField(auto_now_add=True )
-    updated_at=models.DateTimeField(auto_now=True )
-
-    #newest first, can add more filters later like likes, comments etc
     class Meta:
-        ordering=['-created_at']
+        ordering = ["-created_at"]
+        verbose_name = "Job"
+        verbose_name_plural = "Jobs"
 
     def __str__(self):
         return self.title
-    
+
 
 class Posts(models.Model):
 
-    recruiter=models.ForeignKey("accounts.RecruiterProfile", related_name='posts', on_delete=models.CASCADE)
+    recruiter = models.ForeignKey("accounts.RecruiterProfile", related_name="posts", on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    title=models.CharField(max_length=20)
-    description=models.TextField()
-    created_at=models.DateTimeField(auto_now_add=True)
+    class Meta:
+        verbose_name = "Post"
+        verbose_name_plural = "Posts"
+        ordering = ["-created_at"]
 
     def __str__(self):
         return self.title
     
 class Comment(models.Model):
 
-    post=models.ForeignKey(Posts, related_name='comments', on_delete=models.CASCADE)
-    user=models.ForeignKey("accounts.CustomUser", related_name='comments', on_delete=models.CASCADE)
+    post = models.ForeignKey(Posts, related_name="comments", on_delete=models.CASCADE)
+    user = models.ForeignKey("accounts.CustomUser", related_name="user_comments", on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    content=models.TextField()
-    created_at=models.DateTimeField(auto_now_add=True)
+    class Meta:
+        verbose_name = "Comment"
+        verbose_name_plural = "Comments"
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"Comment by {self.user} on {self.post}"
 
 class Like(models.Model):
     post = models.ForeignKey(Posts, on_delete=models.CASCADE, related_name="likes")
-    user = models.ForeignKey("accounts.CustomUser", on_delete=models.CASCADE)
+    user = models.ForeignKey("accounts.CustomUser", on_delete=models.CASCADE, related_name="user_likes")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ['post', 'user']  # prevents duplicate likes
+        unique_together = ("post", "user")
+        verbose_name = "Like"
+        verbose_name_plural = "Likes"
+        constraints = [models.UniqueConstraint(fields=["post", "user"], name="unique_post_like")]
+
+    def __str__(self):
+        return f"{self.user} likes {self.post}"
