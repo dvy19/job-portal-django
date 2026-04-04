@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 
-from models import Comment, Job
+from .models import Comment, Job
 from .models import Post, Comment, Like
 
 # 🔹 Job Serializer
