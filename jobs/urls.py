@@ -1,6 +1,6 @@
 from django.urls import path
 
-from views import CommentView, JobView, LikeToggleView, PostDetailView
+from .views import CommentView, JobView, LikeToggleView, PostDetailView
 
 urlpatterns = [
    
