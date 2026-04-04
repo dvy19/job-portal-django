@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 from django.shortcuts import get_object_or_404
 
-from .models import Post, Comment, Like
+from .models import Posts, Comment, Like
 from .serializers import PostSerializer, CommentSerializer
 from rest_framework import status
 from .serializers import JobSerializer
@@ -28,7 +28,7 @@ class PostView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        posts = Post.objects.all().order_by('-created_at')
+        posts = Posts.objects.all().order_by('-created_at')
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
 
@@ -46,7 +46,7 @@ class PostDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
+        post = get_object_or_404(Posts, id=post_id)
         serializer = PostSerializer(post)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -56,7 +56,7 @@ class CommentView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
+        post = get_object_or_404(Posts, id=post_id)
 
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
@@ -66,7 +66,7 @@ class CommentView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
+        post = get_object_or_404(Posts, id=post_id)
         comments = post.comments.all().order_by('-created_at')
 
         serializer = CommentSerializer(comments, many=True)
@@ -78,7 +78,7 @@ class LikeToggleView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
+        post = get_object_or_404(Posts, id=post_id)
         user = request.user
 
         like, created = Like.objects.get_or_create(user=user, post=post)
