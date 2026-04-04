@@ -1,8 +1,7 @@
 
 from rest_framework import serializers
 
-from .models import Comment, Job
-from .models import Post, Comment, Like
+from .models import Comment, Job, Posts, Like
 
 # 🔹 Job Serializer
 class JobSerializer(serializers.ModelSerializer):
@@ -30,7 +29,7 @@ class PostSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()
 
     class Meta:
-        model = Post
+        model = Posts
         fields = ['id', 'recruiter', 'title', 'description', 'created_at', 'comments', 'likes_count']
 
     def get_likes_count(self, obj):
