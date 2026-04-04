@@ -1,20 +1,30 @@
 from django.db import models
+from pytz import timezone
 
 # Create your models here.
 
+'''
+difference between auto_now_add and auto_now
+-created_first and created_first
+'''
 class Job(models.Model):
 
     user=models.ForeignKey("accounts.RecruiterProfile", related_name='posts', on_delete=models.CASCADE)
 
     title=models.CharField(max_length=100)
-    description=models.TextField()
+    description=models.TextField(default="No Description Available")
     location=models.CharField(max_length=100)
-    stipend=models.DecimalField(max_digits=10, decimal_places=2)
-    created_at=models.DateTimeField(auto_now_add=True)
-    updated_at=models.DateTimeField(auto_now=True)
+    '''
+    can store values up to 99,999,999.99 (10 digits total, 2 after decimal).
+    Default is 0.00.
+    '''
+    stipend=models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    created_at=models.DateTimeField(auto_now_add=True )
+    updated_at=models.DateTimeField(auto_now=True )
 
+    #newest first, can add more filters later like likes, comments etc
     class Meta:
-        ordering=['created_at']
+        ordering=['-created_at']
 
     def __str__(self):
         return self.title
