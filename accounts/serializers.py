@@ -69,6 +69,7 @@ class JobSeekerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobSeekerProfile
         fields = '__all__'
+        read_only_fields = ['user']  # user will be set from the view, not the request data
 
     def create(self, validated_data):
         profile = JobSeekerProfile.objects.create(**validated_data)
