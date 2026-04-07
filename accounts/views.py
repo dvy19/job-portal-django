@@ -72,9 +72,18 @@ class JobRecruiterProfileView(APIView):
 
         if serializer.is_valid():
             serializer.save(user=request.user)
-            return Response(serializer.data)
+            return Response(
+                {
+                    "message": "Recruiter profile created successfully",
+                    "data": serializer.data,
+                },
+                status=status.HTTP_201_CREATED,
+            )
         
-        return Response(serializer.errors)
+        return Response(
+            {"message": "Failed to create recruiter profile", "errors": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 class JobSeekerProfileView(APIView):
     permission_classes = [IsAuthenticated]
@@ -84,6 +93,15 @@ class JobSeekerProfileView(APIView):
         
         if serializer.is_valid():
             serializer.save(user=request.user)
-            return Response(serializer.data)
+            return Response(
+                {
+                    "message": "Job seeker profile created successfully",
+                    "data": serializer.data,
+                },
+                status=status.HTTP_201_CREATED,
+            )
         
-        return Response(serializer.errors)
+        return Response(
+            {"message": "Failed to create job seeker profile", "errors": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
