@@ -73,13 +73,3 @@ class JobSeekerProfile(models.Model):
     def __str__(self):
         return self.full_name
     
-
-class Qualification(models.Model):
-    profile = models.ForeignKey(JobSeekerProfile, on_delete=models.CASCADE, related_name='qualifications')
-
-    degree = models.CharField(max_length=50)  # 12th, Undergraduate, Postgraduate
-    status = models.CharField(max_length=20)  # Completed / Pursuing
-    year_of_completion = models.IntegerField()
-
-    def __str__(self):
-        return f"{self.degree} - {self.profile.full_name}"
