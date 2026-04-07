@@ -6,8 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 from django.shortcuts import get_object_or_404
 
-from .models import Posts, Comment, Like
-from .serializers import PostSerializer, CommentSerializer
+from .models import Blog, Posts, Comment, Like
+from .serializers import BlogSerializer, PostSerializer, CommentSerializer
 from rest_framework import status
 from .serializers import JobSerializer
 class JobView(APIView):
@@ -22,6 +22,22 @@ class JobView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+class BlogView(APIView):
+
+    permission_classes=[IsAuthenticated]
+
+    def post(self,request):
+        serializer=BlogSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save(user=request.user.recruiterprofile)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self,request):
+        blogs=Blog.objects.all().order_by('-created_at')
+        serializer=BlogSerializer(blogs,many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 # 🔥 Create + List Posts
 class PostView(APIView):
