@@ -16,6 +16,21 @@ class JobPagination(PageNumberPagination):
     page_size = 10
 
 
+class BlogDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        try:
+            blog = Blog.objects.get(pk=pk)
+        except Blog.DoesNotExist:
+            return Response({"error": "Blog not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Check ownership
+        if blog.user != request.user.recruiterprofile:
+            return Response({"error": "Not allowed"}, status=status.HTTP_403_FORBIDDEN)
+
+        blog.delete()
+        return Response({"message": "Blog deleted successfully"}, status=status.HTTP_200_OK)
 class JobView(APIView):
 
     permission_classes=[IsAuthenticated]

@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import BlogView, CommentView, JobView, LikeToggleView, PostDetailView, PostView
+from .views import BlogDeleteView, BlogView, CommentView, JobView, LikeToggleView, PostDetailView, PostView
 
 urlpatterns = [
    
@@ -9,6 +9,8 @@ urlpatterns = [
     path('recruiter/create_post/', PostView.as_view()),
 
     path('create_blogs/', BlogView.as_view()),
+    path("delete_blog/<int:pk>/", BlogDeleteView.as_view(), name="delete-blog"),
+
 
     path('posts/<int:post_id>/', PostDetailView.as_view()),
 
