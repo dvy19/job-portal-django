@@ -58,9 +58,7 @@ class RecruiterProfileSerializer(serializers.ModelSerializer):
         
 
     
-    def create(self,validated_data):
-        profile=RecruiterProfile.objects.create(**validated_data)
-        return profile
+  
 
 
 

@@ -69,23 +69,6 @@ class RegisterView(APIView):
 class JobRecruiterProfileView(APIView):
     permission_classes=[IsAuthenticated]
 
-    def post(self, request):
-        serializer=RecruiterProfileSerializer(data=request.data)
-
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(
-                {
-                    "message": "Recruiter profile created successfully",
-                    "data": serializer.data,
-                },
-                status=status.HTTP_201_CREATED,
-            )
-        
-        return Response(
-            {"message": "Failed to create recruiter profile", "errors": serializer.errors},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
     
     def get(self, request):
         try:
