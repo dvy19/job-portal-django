@@ -31,6 +31,7 @@ class BlogDeleteView(APIView):
 
         blog.delete()
         return Response({"message": "Blog deleted successfully"}, status=status.HTTP_200_OK)
+
 class JobView(APIView):
 
     permission_classes=[IsAuthenticated]
@@ -40,7 +41,13 @@ class JobView(APIView):
 
         if serializer.is_valid():
             serializer.save(user=request.user.recruiterprofile)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(
+                {
+                    "message": "Job created successfully",
+                    "data": serializer.data,
+                },
+                status=status.HTTP_201_CREATED,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def get(self, request):
