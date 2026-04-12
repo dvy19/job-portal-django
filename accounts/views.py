@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 
-from .models import RecruiterProfile
+from .models import RecruiterProfile, JobSeekerProfile
 from .serializers import JobSeekerProfileSerializer, LoginSerializer, RecruiterProfileSerializer, RegisterSerializer
 
 # Helper function — generates JWT tokens for a given user
@@ -69,6 +69,23 @@ class RegisterView(APIView):
 class JobRecruiterProfileView(APIView):
     permission_classes=[IsAuthenticated]
 
+    def post(self, request):
+        serializer=RecruiterProfileSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(
+                {
+                    "message": "Recruiter profile created successfully",
+                    "data": serializer.data,
+                },
+                status=status.HTTP_201_CREATED,
+            )
+        
+        return Response(
+            {"message": "Failed to create recruiter profile", "errors": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
     
     def get(self, request):
         try:
@@ -101,3 +118,11 @@ class JobSeekerProfileView(APIView):
             {"message": "Failed to create job seeker profile", "errors": serializer.errors},
             status=status.HTTP_400_BAD_REQUEST,
         )
+    
+    def get(self, request):
+        try:
+            profile = JobSeekerProfile.objects.get(user=request.user)
+            serializer = JobSeekerProfileSerializer(profile)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except JobSeekerProfile.DoesNotExist:
+            return Response({"message": "Job seeker profile not found"}, status=status.HTTP_404_NOT_FOUND)
