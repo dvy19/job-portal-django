@@ -91,9 +91,17 @@ class JobRecruiterProfileView(APIView):
         try:
             profile = RecruiterProfile.objects.get(user=request.user)
             serializer = RecruiterProfileSerializer(profile)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+
+            return Response({
+                "message": "Profile fetched successfully",
+                "data": serializer.data
+            }, status=200)
+
         except RecruiterProfile.DoesNotExist:
-            return Response({"message": "Recruiter profile not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({
+                "message": "Profile not found",
+                "data": None
+            }, status=200)
 
 
 
