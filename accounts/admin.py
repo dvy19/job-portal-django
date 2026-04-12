@@ -31,7 +31,7 @@ class CustomUserAdmin(UserAdmin):
 
 # Optional: Improve RecruiterProfile admin view
 class RecruiterProfileAdmin(admin.ModelAdmin):
-    list_display = ("full_name", "company_name", "user","position","city","state")  # adjust fields as per your model
+    list_display = ("id","full_name", "company_name", "user","position","city","state")  # adjust fields as per your model
     search_fields = ("user__email", "company_name")
 
 
