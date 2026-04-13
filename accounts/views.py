@@ -1,4 +1,3 @@
-from httpx import request
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -9,7 +8,6 @@ from rest_framework.permissions import IsAuthenticated
 from .models import RecruiterProfile, JobSeekerProfile
 from .serializers import JobSeekerProfileSerializer, LoginSerializer, RecruiterProfileSerializer, RegisterSerializer
 
-# Helper function — generates JWT tokens for a given user
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
     return {
@@ -68,7 +66,7 @@ class RegisterView(APIView):
         
 
 class JobRecruiterProfileView(APIView):
-    #permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
 
     def post(self, request):
         serializer=RecruiterProfileSerializer(data=request.data)
