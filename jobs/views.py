@@ -69,13 +69,8 @@ class BlogView(APIView):
         if serializer.is_valid():
             serializer.save(user=request.user.recruiterprofile)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(
-                {
-                    "message": "Blog created successfully",
-                    "data": serializer.data,
-                },
-                status=status.HTTP_201_CREATED,
-            )  
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
       
     def get(self,request):
         blogs=Blog.objects.all().order_by('-created_at')
