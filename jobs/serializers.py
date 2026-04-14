@@ -41,13 +41,34 @@ class CommentSerializer(serializers.ModelSerializer):
 
 # 🔹 Post Serializer
 class PostSerializer(serializers.ModelSerializer):
-    recruiter = serializers.StringRelatedField(read_only=True)
+    full_name = serializers.SerializerMethodField()
+    company_name = serializers.SerializerMethodField()
+
+    user = serializers.StringRelatedField(read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
     likes_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Posts
-        fields = ['id', 'recruiter', 'title', 'description', 'created_at', 'comments', 'likes_count']
+        fields = [
+            'id',
+            'user',
+            'title',
+            'description',
+            'created_at',
+            'full_name',
+            'company_name',
+            'comments',
+            'likes_count'
+        ]
+
+    def get_full_name(self, obj):
+        return obj.user.full_name  # adjust if different field name
+
+    def get_company_name(self, obj):
+        if hasattr(obj.user, 'recruiterprofile'):
+            return obj.user.recruiterprofile.company_name
+        return None
 
     def get_likes_count(self, obj):
         return obj.likes.count()
