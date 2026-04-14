@@ -64,7 +64,7 @@ class PostSerializer(serializers.ModelSerializer):
             'company_name',
             'comments',
             'likes_count'
-        ],
+        ]
         read_only_fields = ['id', 'created_at', 'user', 'full_name', 'company_name', 'comments', 'likes_count']
 
     def get_full_name(self, obj):
