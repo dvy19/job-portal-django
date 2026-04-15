@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from psycopg2 import IntegrityError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -78,17 +79,17 @@ class ApplyJobView(APIView):
     def post(self, request, job_id):
         user = request.user
 
+        # ✅ Get Job
         try:
             job = Job.objects.get(id=job_id)
         except Job.DoesNotExist:
             return Response({"error": "Job not found"}, status=404)
 
-        # Check if already applied
-        if JobApplication.objects.filter(user=user, job=job).exists():
-            return Response({"message": "Already applied"}, status=400)
-
-        # Create application
-        application = JobApplication.objects.create(user=user, job=job)
+        # ✅ Safe Create (handles duplicate apply)
+        try:
+            application = JobApplication.objects.create(user=user, job=job)
+        except IntegrityError:
+            return Response({"error": "You already applied to this job"}, status=400)
 
         serializer = JobApplicationSerializer(application)
         return Response(serializer.data, status=201)
