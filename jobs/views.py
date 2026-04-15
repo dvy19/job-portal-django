@@ -106,7 +106,7 @@ class PostView(APIView):
     def post(self, request):
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(recruiter=request.user)
+            serializer.save(user=request.user)
             return Response(serializer.data)
         return Response(serializer.errors)
 
