@@ -51,15 +51,16 @@ class Job(models.Model):
 
 
 class JobApplication(models.Model):
-    user = models.ForeignKey("accounts.CustomUser", on_delete=models.CASCADE,null=True, related_name="job_applications",blank=True)
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, null=True, related_name="applications",blank=True   )
-    applied_at = models.DateTimeField(auto_now_add=True,null=True, blank=True)
+
+    user = models.ForeignKey("accounts.CustomUser", on_delete=models.CASCADE, related_name="job_applications")
+    job = models.ForeignKey(Job, on_delete=models.CASCADE,related_name="applications" )
+    applied_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('user', 'job')
 
     def __str__(self):
-        return f"{self.user} applied to {self.job}"
+        return f"{self.user} applied to {self.job}" if self.user and self.job else "Invalid Application"
 
 class Posts(models.Model):
 
