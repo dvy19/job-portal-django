@@ -67,20 +67,17 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database — uses PostgreSQL on Render, SQLite locally
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-if DATABASE_URL:
-    # On Render — use PostgreSQL
+if os.environ.get("RENDER"):  # ONLY true on Render
     DATABASES = {
-        "default": dj_database_url.parse(DATABASE_URL)
+        "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
     }
 else:
-    # Locally — use SQLite
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},

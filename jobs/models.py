@@ -51,9 +51,9 @@ class Job(models.Model):
 
 
 class JobApplication(models.Model):
-    user = models.ForeignKey("accounts.CustomUser", on_delete=models.CASCADE)
-    job = models.ForeignKey(Job, on_delete=models.CASCADE)
-    applied_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey("accounts.CustomUser", on_delete=models.CASCADE,null=True, blank=True)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE,null=True, blank=True)
+    applied_at = models.DateTimeField(auto_now_add=True,null=True, blank=True)
 
     class Meta:
         unique_together = ('user', 'job')  # ✅ prevents duplicate apply
