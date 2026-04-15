@@ -5,8 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 from django.shortcuts import get_object_or_404
 
-from .models import Blog, Job, Posts, Comment, Like
-from .serializers import BlogSerializer, PostSerializer, CommentSerializer
+from .models import Blog, Job, JobApplication, Posts, Comment, Like
+from .serializers import BlogSerializer, JobApplicationSerializer, PostSerializer, CommentSerializer
 from rest_framework import status
 from .serializers import JobSerializer
 
@@ -71,6 +71,29 @@ class BlogView(APIView):
         serializer=BlogSerializer(blogs,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class ApplyJobView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, job_id):
+        user = request.user
+
+        try:
+            job = Job.objects.get(id=job_id)
+        except Job.DoesNotExist:
+            return Response({"error": "Job not found"}, status=404)
+
+        # Check if already applied
+        if JobApplication.objects.filter(user=user, job=job).exists():
+            return Response({"message": "Already applied"}, status=400)
+
+        # Create application
+        application = JobApplication.objects.create(user=user, job=job)
+
+        serializer = JobApplicationSerializer(application)
+        return Response(serializer.data, status=201)
+    
+    
 # 🔥 Create + List Posts
 class PostView(APIView):
     permission_classes = [IsAuthenticated]

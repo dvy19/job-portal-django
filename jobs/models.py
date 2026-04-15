@@ -50,6 +50,17 @@ class Job(models.Model):
         return self.title
 
 
+class JobApplication(models.Model):
+    user = models.ForeignKey("accounts.CustomUser", on_delete=models.CASCADE)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    applied_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'job')  # ✅ prevents duplicate apply
+
+    def __str__(self):
+        return f"{self.user} applied to {self.job}"
+
 class Posts(models.Model):
 
     user = models.ForeignKey("accounts.CustomUser", related_name="posts", on_delete=models.CASCADE)

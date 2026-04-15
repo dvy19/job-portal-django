@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 
-from .models import Blog, Comment, Job, Posts, Like
+from .models import Blog, Comment, Job, JobApplication, Posts, Like
 
 
 class BlogSerializer(serializers.ModelSerializer):
@@ -38,6 +38,12 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['id', 'user', 'content', 'created_at']
 
+
+class JobApplicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobApplication
+        fields = ['id', 'user', 'job', 'applied_at']
+        read_only_fields = ['user', 'applied_at']
 
 # 🔹 Post Serializer
 class PostSerializer(serializers.ModelSerializer):

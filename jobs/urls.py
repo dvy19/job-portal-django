@@ -1,10 +1,12 @@
 from django.urls import path
 
-from .views import BlogDeleteView, BlogView, CommentView, JobView, LikeToggleView, PostDetailView, PostView
+from .views import ApplyJobView, BlogDeleteView, BlogView, CommentView, JobView, LikeToggleView, PostDetailView, PostView
 
 urlpatterns = [
    
     path('recruiter/create_job/', JobView.as_view()),
+
+    path('apply/<int:job_id>/', ApplyJobView.as_view(), name='apply-job'),
 
     path('recruiter/create_post/', PostView.as_view()),
 
