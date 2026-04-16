@@ -1,7 +1,6 @@
 from django.urls import path
 
-from .views import ApplyJobView, BlogDeleteView, BlogView, CommentView, JobView, LikeToggleView, PostDetailView, PostView
-
+from .views import  BlogDeleteView, BlogView, JobView
 urlpatterns = [
    
     path('recruiter/create_job/', JobView.as_view()),

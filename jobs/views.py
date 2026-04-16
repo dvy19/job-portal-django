@@ -5,10 +5,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 # Create your views here.
-from django.shortcuts import get_object_or_404
 
-from .models import Blog, Job, JobApplication, Posts, Comment, Like
-from .serializers import BlogSerializer, JobApplicationSerializer, PostSerializer, CommentSerializer
+from .models import Blog, Job
+from .serializers import BlogSerializer
 from rest_framework import status
 from .serializers import JobSerializer
 
