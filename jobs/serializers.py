@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 
-from .models import Blog, Comment, Job
+from .models import Blog, Job
 
 class BlogSerializer(serializers.ModelSerializer):
 
