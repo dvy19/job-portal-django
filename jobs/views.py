@@ -74,7 +74,6 @@ class BlogView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ApplyJobView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, job_id):
@@ -96,69 +95,3 @@ class ApplyJobView(APIView):
         return Response(serializer.data, status=201)
     
     
-# 🔥 Create + List Posts
-class PostView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        posts = Posts.objects.all().order_by('-created_at')
-        serializer = PostSerializer(posts, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = PostSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data)
-        return Response(serializer.errors)
-
-
-
-# 🔥 Single Post
-class PostDetailView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, post_id):
-        post = get_object_or_404(Posts, id=post_id)
-        serializer = PostSerializer(post)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-# 💬 Comment View
-class CommentView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, post_id):
-        post = get_object_or_404(Posts, id=post_id)
-
-        serializer = CommentSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user, post=post)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def get(self, request, post_id):
-        post = get_object_or_404(Posts, id=post_id)
-        comments = post.comments.all().order_by('-created_at')
-
-        serializer = CommentSerializer(comments, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-# ❤️ Like Toggle
-class LikeToggleView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, post_id):
-        post = get_object_or_404(Posts, id=post_id)
-        user = request.user
-
-        like, created = Like.objects.get_or_create(user=user, post=post)
-
-        if not created:
-            like.delete()
-            return Response({"liked": False}, status=status.HTTP_200_OK)
-
-        return Response({"liked": True}, status=status.HTTP_201_CREATED)
-

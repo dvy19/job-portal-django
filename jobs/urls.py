@@ -6,19 +6,13 @@ urlpatterns = [
    
     path('recruiter/create_job/', JobView.as_view()),
 
-    path('apply/<int:job_id>/', ApplyJobView.as_view(), name='apply-job'),
 
-    path('recruiter/create_post/', PostView.as_view()),
 
     path('create_blogs/', BlogView.as_view()),
+
     path("delete_blog/<int:pk>/", BlogDeleteView.as_view(), name="delete-blog"),
 
 
-    path('posts/<int:post_id>/', PostDetailView.as_view()),
-
-    path('posts/<int:post_id>/comments/', CommentView.as_view()),
-
-    path('posts/<int:post_id>/like/', LikeToggleView.as_view()),
 
 ]
 
