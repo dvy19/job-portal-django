@@ -12,13 +12,6 @@ class BlogSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['id', 'created_at', 'updated_at', 'user']
 
-class BlogCommentSerialzer(serializers.ModelSerializer):
-    user=serializers.StringRelatedField(read_only=True)
-
-    class Meta:
-        model=Comment
-        fields=['id','user','content','created_at']
-
 # 🔹 Job Serializer
 class JobSerializer(serializers.ModelSerializer):
     recruiter = serializers.StringRelatedField(read_only=True)

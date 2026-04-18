@@ -16,7 +16,6 @@ def get_tokens_for_user(user):
     }
 
 
-
 class LoginView(APIView):
     permission_classes = [AllowAny]  # no auth needed to login
 

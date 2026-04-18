@@ -72,25 +72,3 @@ class BlogView(APIView):
         serializer=BlogSerializer(blogs,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, job_id):
-        user = request.user
-
-        # ✅ Get Job
-        try:
-            job = Job.objects.get(id=job_id)
-        except Job.DoesNotExist:
-            return Response({"error": "Job not found"}, status=404)
-
-        # ✅ Safe Create (handles duplicate apply)
-        try:
-            application = JobApplication.objects.create(user=user, job=job)
-        except IntegrityError:
-            return Response({"error": "You already applied to this job"}, status=400)
-
-        serializer = JobApplicationSerializer(application)
-        return Response(serializer.data, status=201)
-    
-    
