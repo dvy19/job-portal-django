@@ -61,6 +61,20 @@ class RecruiterProfile(models.Model):
         return self.full_name
 
 
+  
+class Skill(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def save(self, *args, **kwargs):
+        # Normalize to avoid duplicates like Python, python, PYTHON
+        self.name = self.name.strip().title()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+    
+
+
 class JobSeekerProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
 
@@ -72,6 +86,8 @@ class JobSeekerProfile(models.Model):
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
 
+    skills = models.ManyToManyField(Skill, blank=True, related_name="job_seekers")
+
     def __str__(self):
         return self.full_name
-    
+  

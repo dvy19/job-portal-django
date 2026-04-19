@@ -2,6 +2,9 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser, RecruiterProfile
 
+from .models import Skill
+
+admin.site.register(Skill)
 
 class CustomUserAdmin(UserAdmin):
 

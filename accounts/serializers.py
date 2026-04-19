@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, RecruiterProfile
+from .models import CustomUser, RecruiterProfile, Skill
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import JobSeekerProfile
@@ -60,19 +60,42 @@ class RecruiterProfileSerializer(serializers.ModelSerializer):
     
   
 
-
-
 class JobSeekerProfileSerializer(serializers.ModelSerializer):
+    skills = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Skill.objects.all()
+    )
 
     class Meta:
         model = JobSeekerProfile
         fields = '__all__'
-        read_only_fields = ['user']  # user will be set from the view, not the request data
+        read_only_fields = ['user']
+        
 
     def create(self, validated_data):
+        skills = validated_data.pop('skills', [])  # extract skills
         profile = JobSeekerProfile.objects.create(**validated_data)
+        profile.skills.set(skills)  # assign many-to-many
         return profile
+    
+    def update(self, instance, validated_data):
+        skills = validated_data.pop('skills', None)
 
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+        if skills is not None:
+            instance.skills.set(skills)
+
+        return instance
+
+class SkillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Skill
+        fields = ['id', 'name']
+        read_only_fields = ['id']
     
 
   

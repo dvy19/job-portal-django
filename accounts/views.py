@@ -5,8 +5,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 
-from .models import RecruiterProfile, JobSeekerProfile
-from .serializers import JobSeekerProfileSerializer, LoginSerializer, RecruiterProfileSerializer, RegisterSerializer
+from .models import RecruiterProfile, JobSeekerProfile, Skill
+from .serializers import JobSeekerProfileSerializer, LoginSerializer, RecruiterProfileSerializer, RegisterSerializer, SkillSerializer
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -109,9 +109,10 @@ class JobRecruiterProfileView(APIView):
 class JobSeekerProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
+    # 🔹 CREATE PROFILE
     def post(self, request):
         serializer = JobSeekerProfileSerializer(data=request.data)
-        
+
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(
@@ -121,16 +122,109 @@ class JobSeekerProfileView(APIView):
                 },
                 status=status.HTTP_201_CREATED,
             )
-        
+
         return Response(
             {"message": "Failed to create job seeker profile", "errors": serializer.errors},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
+    # 🔹 GET PROFILE
     def get(self, request):
         try:
             profile = JobSeekerProfile.objects.get(user=request.user)
             serializer = JobSeekerProfileSerializer(profile)
             return Response(serializer.data, status=status.HTTP_200_OK)
+
         except JobSeekerProfile.DoesNotExist:
-            return Response({"message": "Job seeker profile not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": "Job seeker profile not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+    # 🔹 UPDATE PROFILE (IMPORTANT for skills)
+    def put(self, request):
+        try:
+            profile = JobSeekerProfile.objects.get(user=request.user)
+        except JobSeekerProfile.DoesNotExist:
+            return Response(
+                {"message": "Profile not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = JobSeekerProfileSerializer(
+            profile, data=request.data, partial=True
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {
+                    "message": "Profile updated successfully",
+                    "data": serializer.data,
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        return Response(
+            {"message": "Update failed", "errors": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    
+    def patch(self, request):
+        try:
+            profile = JobSeekerProfile.objects.get(user=request.user)
+        except JobSeekerProfile.DoesNotExist:
+            return Response(
+                {"message": "Profile not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = JobSeekerProfileSerializer(
+            profile,
+            data=request.data,
+            partial=True   # always used in PATCH
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {
+                    "message": "Profile updated successfully",
+                    "data": serializer.data,
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        return Response(
+            {"message": "Update failed", "errors": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    
+
+
+class SkillView(APIView):
+
+    # GET all skills (for dropdown)
+    def get(self, request):
+        skills = Skill.objects.all()
+        serializer = SkillSerializer(skills, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # POST new skill (custom skill)
+    def post(self, request):
+        serializer = SkillSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {
+                    "message": "Skill created successfully",
+                    "data": serializer.data,
+                },
+                status=status.HTTP_201_CREATED,
+            )
+
+        return Response(
+            {"message": "Failed to create skill", "errors": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
