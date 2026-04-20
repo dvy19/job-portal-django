@@ -11,3 +11,19 @@ urlpatterns = [
     path('skills/', SkillView.as_view()),   # 🔥 separate skill endpoint
 
 ]
+
+'''
+
+{
+    "name":"Kotlin App Development"
+}
+
+
+{
+    "message": "Skill created successfully",
+    "data": {
+        "id": 3,
+        "name": "Kotlin App Development"
+    }
+}
+'''

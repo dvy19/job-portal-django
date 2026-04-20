@@ -35,22 +35,27 @@ class BlogDeleteView(APIView):
 
 class JobView(APIView):
 
-    permission_classes=[IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
-    def post(self,request):
-        serializer=JobSerializer(data=request.data)
+    def post(self, request):
+        serializer = JobSerializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.save(user=request.user.recruiterprofile)
-            return Response( serializer.data , status=status.HTTP_201_CREATED)
+            job = serializer.save(user=request.user.recruiterprofile)
+
+            # Re-serialize to include skill_names in response
+            response_serializer = JobSerializer(job)
+
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     def get(self, request):
         jobs = Job.objects.all().order_by('-created_at')
-                                                                             
+
         paginator = JobPagination()
         paginated_jobs = paginator.paginate_queryset(jobs, request)
-        
+
         serializer = JobSerializer(paginated_jobs, many=True)
         return paginator.get_paginated_response(serializer.data)
     
