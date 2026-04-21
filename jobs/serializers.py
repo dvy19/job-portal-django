@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 
-from .models import Blog, Job, Skill
+from .models import Blog, Job, JobApplication
 
 class BlogSerializer(serializers.ModelSerializer):
 
@@ -35,7 +35,7 @@ class JobSerializer(serializers.ModelSerializer):
         job = Job.objects.create(**validated_data)
 
         for skill_name in skills_data:
-            skill, _ = Skill.objects.get_or_create(name=skill_name)
+            skill, _ = "accounts.Skill".objects.get_or_create(name=skill_name)
             job.skills.add(skill)
 
         return job
@@ -52,9 +52,17 @@ class JobSerializer(serializers.ModelSerializer):
         if skills_data is not None:
             instance.skills.clear()
             for skill_name in skills_data:
-                skill, _ = Skill.objects.get_or_create(name=skill_name)
+                skill, _ = "accounts.Skill".objects.get_or_create(name=skill_name)
                 instance.skills.add(skill)
 
         return instance
+    
+
+class JobApplicationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = JobApplication
+        fields = '__all__'
+        read_only_fields = ['applicant', 'status', 'applied_at']
 
 

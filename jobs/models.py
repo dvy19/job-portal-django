@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Blog(models.Model):
     user=models.ForeignKey("accounts.RecruiterProfile",
                            related_name="blogs",on_delete=models.CASCADE)
@@ -51,5 +52,43 @@ class Job(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+class JobApplication(models.Model):
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    ]
+
+    job = models.ForeignKey(
+        Job,
+        on_delete=models.CASCADE,
+        related_name='applications'
+    )
+
+    applicant = models.ForeignKey(
+        "accounts.JobSeekerProfile",
+        on_delete=models.CASCADE,
+        related_name='applications'
+    )
+
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
+    applied_at = models.DateTimeField(auto_now_add=True)
+
+    # Optional but useful
+    #cover_letter = models.TextField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ['job', 'applicant']  # ❗ Prevent duplicate apply
+
+    def __str__(self):
+        return f"{self.applicant.full_name} applied to {self.job.title}"
 
 

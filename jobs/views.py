@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 
-from .models import Blog, Job
-from .serializers import BlogSerializer
+from .models import Blog, Job, JobApplication
+from .serializers import BlogSerializer, JobApplicationSerializer
 from rest_framework import status
 from .serializers import JobSerializer
 
@@ -77,3 +77,46 @@ class BlogView(APIView):
         serializer=BlogSerializer(blogs,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class ApplyJobView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+
+        job_id = request.data.get("job")
+
+        # ❗ Check job exists
+        try:
+            job = Job.objects.get(id=job_id)
+        except Job.DoesNotExist:
+            return Response(
+                {"error": "Job not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # ❗ Get logged-in job seeker
+        try:
+            applicant = request.user.jobseekerprofile
+        except:
+            return Response(
+                {"error": "Only job seekers can apply"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # ❗ Prevent duplicate application
+        if JobApplication.objects.filter(job=job, applicant=applicant).exists():
+            return Response(
+                {"error": "You have already applied for this job"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # ✅ Create application
+        application = JobApplication.objects.create(
+            job=job,
+            applicant=applicant
+        )
+
+        serializer = JobApplicationSerializer(application)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
