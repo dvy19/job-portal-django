@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 # Create your views here.
+from django.shortcuts import get_object_or_404
 
 from .models import Blog, Job, JobApplication
 from .serializers import BlogSerializer, JobApplicationSerializer
@@ -43,14 +44,20 @@ class JobView(APIView):
         if serializer.is_valid():
             job = serializer.save(user=request.user.recruiterprofile)
 
-            # Re-serialize to include skill_names in response
             response_serializer = JobSerializer(job)
-
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request):
+    def get(self, request, id=None):
+
+        # 🔹 CASE 1: Get single job
+        if id is not None:
+            job = get_object_or_404(Job, id=id)
+            serializer = JobSerializer(job)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        # 🔹 CASE 2: Get all jobs (your existing logic)
         jobs = Job.objects.all().order_by('-created_at')
 
         paginator = JobPagination()
