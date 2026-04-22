@@ -2,6 +2,7 @@
 from rest_framework import serializers
 
 from .models import Blog, Job, JobApplication
+from accounts.models import Skill
 
 class BlogSerializer(serializers.ModelSerializer):
 
@@ -21,13 +22,15 @@ class JobSerializer(serializers.ModelSerializer):
         write_only=True
     )
 
-    skill_names = serializers.SerializerMethodField(read_only=True)
-
+    skill_names = serializers.SerializerMethodField()
 
     class Meta:
         model = Job
         fields = '__all__'
-        read_only_fields = ['id', 'created_at','user', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'user', 'updated_at']
+
+    def get_skill_names(self, obj):
+        return [skill.name for skill in obj.skills.all()]
 
     def create(self, validated_data):
         skills_data = validated_data.pop('skills', [])
@@ -35,7 +38,7 @@ class JobSerializer(serializers.ModelSerializer):
         job = Job.objects.create(**validated_data)
 
         for skill_name in skills_data:
-            skill, _ = "accounts.Skill".objects.get_or_create(name=skill_name)
+            skill, _ = Skill.objects.get_or_create(name=skill_name)
             job.skills.add(skill)
 
         return job
@@ -43,16 +46,14 @@ class JobSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         skills_data = validated_data.pop('skills', None)
 
-        # Update normal fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
-        # Update skills if provided
         if skills_data is not None:
             instance.skills.clear()
             for skill_name in skills_data:
-                skill, _ = "accounts.Skill".objects.get_or_create(name=skill_name)
+                skill, _ = Skill.objects.get_or_create(name=skill_name)
                 instance.skills.add(skill)
 
         return instance

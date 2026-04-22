@@ -4,7 +4,7 @@ from .views import  ApplyJobView, BlogDeleteView, BlogView, JobView
 urlpatterns = [
    
     path('recruiter/create_job/', JobView.as_view()),
-    path('jobs/<int:id>/', JobView.as_view()), # detail
+    path('getJob/<int:id>/', JobView.as_view()), # detail
 
 
 
