@@ -5,7 +5,14 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 
-from .models import RecruiterProfile, JobSeekerProfile, Skill
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+from .serializers import ForgotPasswordSerializer, ResetPasswordSerializer
+
+
+from .models import CustomUser, RecruiterProfile, JobSeekerProfile, Skill
 from .serializers import JobSeekerProfileSerializer, LoginSerializer, RecruiterProfileSerializer, RegisterSerializer, SkillSerializer
 
 def get_tokens_for_user(user):
@@ -15,7 +22,27 @@ def get_tokens_for_user(user):
         "access":  str(refresh.access_token),
     }
 
+class ForgotPasswordView(APIView):
+    def post(self, request):
+        serializer = ForgotPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
+        return Response(
+            {"message": "If the email exists, a password reset link has been sent."},
+            status=status.HTTP_200_OK
+        )
+    
+class ResetPasswordView(APIView):
+    def post(self, request):
+        serializer = ResetPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(
+            {"message": "Password reset successful."},
+            status=status.HTTP_200_OK
+        )
 class LoginView(APIView):
     permission_classes = [AllowAny]  # no auth needed to login
 

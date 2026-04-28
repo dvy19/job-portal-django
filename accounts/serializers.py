@@ -4,6 +4,79 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import JobSeekerProfile
 
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.password_validation import validate_password
+
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        uid = attrs.get("uid")
+        token = attrs.get("token")
+        password = attrs.get("password")
+
+        # Decode UID
+        try:
+            user_id = urlsafe_base64_decode(uid).decode()
+            user = CustomUser.objects.get(id=user_id)
+        except:
+            raise serializers.ValidationError("Invalid user")
+
+        # Validate token
+        if not PasswordResetTokenGenerator().check_token(user, token):
+            raise serializers.ValidationError("Invalid or expired token")
+
+        # Validate password (Django built-in validators)
+        validate_password(password, user)
+
+        # Store user for save()
+        self.user = user
+        return attrs
+
+    def save(self):
+        password = self.validated_data["password"]
+
+        self.user.set_password(password)
+        self.user.save()
+
+        return self.user
+    
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        # We don't raise error if user doesn't exist (security)
+        self.user = CustomUser.objects.filter(email=value).first()
+        return value
+
+    def save(self):
+        if not self.user:
+            return  # silently ignore
+
+        # Generate token + uid
+        token = PasswordResetTokenGenerator().make_token(self.user)
+        uid = urlsafe_base64_encode(force_bytes(self.user.id))
+
+        # Reset link (frontend URL)
+        reset_link = f"https://job-portal-django-1-rc3u.onrender.com/api/jobs/reset-password/{uid}/{token}/"
+
+        # Send email
+        send_mail(
+            subject="Reset Your Password",
+            message=f"Click the link to reset your password:\n{reset_link}",
+            from_email="noreply@jobportal.com",
+            recipient_list=[self.user.email],
+        )
+
 class RegisterSerializer(serializers.ModelSerializer):
 
     # write_only = password will never be sent back in response

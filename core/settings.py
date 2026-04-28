@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'jobs',
     'applications',
 ]
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
