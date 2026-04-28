@@ -1,3 +1,5 @@
+import token
+
 from rest_framework import serializers
 from .models import CustomUser, RecruiterProfile, Skill
 from django.contrib.auth import authenticate
@@ -65,9 +67,13 @@ class ForgotPasswordSerializer(serializers.Serializer):
         # Generate token + uid
         token = PasswordResetTokenGenerator().make_token(self.user)
         uid = urlsafe_base64_encode(force_bytes(self.user.id))
-
+        
+        print("UID:", uid)
+        print("TOKEN:", token)
         # Reset link (frontend URL)
         reset_link = f"https://job-portal-django-1-rc3u.onrender.com/api/jobs/reset-password/{uid}/{token}/"
+
+        print("RESET LINK:", reset_link)
 
         # Send email
         send_mail(
