@@ -80,12 +80,14 @@ class ForgotPasswordSerializer(serializers.Serializer):
         print("RESET LINK:", reset_link)
 
         # Send email
-        send_mail(
+        result = send_mail(
             subject="Reset Your Password",
             message=f"Click the link to reset your password:\n{reset_link}",
             from_email=os.getenv("EMAIL_HOST_USER"),
             recipient_list=[self.user.email],
         )
+
+        print("EMAIL RESULT:", result)
 
 class RegisterSerializer(serializers.ModelSerializer):
 
