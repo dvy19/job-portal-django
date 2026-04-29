@@ -79,7 +79,7 @@ class ForgotPasswordSerializer(serializers.Serializer):
         send_mail(
             subject="Reset Your Password",
             message=f"Click the link to reset your password:\n{reset_link}",
-            from_email="noreply@jobportal.com",
+            from_email=settings.EMAIL_HOST_USER,
             recipient_list=[self.user.email],
         )
 
