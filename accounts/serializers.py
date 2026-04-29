@@ -1,5 +1,5 @@
 import os
-from pickle import load
+from dotenv import load_dotenv
 import token
 
 from rest_framework import serializers
@@ -16,8 +16,8 @@ from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.password_validation import validate_password
 
-load.dotenv()  # Load environment variables from .env file
-
+#Load environment variables from .env file
+load_dotenv()
 
 
 class ResetPasswordSerializer(serializers.Serializer):
