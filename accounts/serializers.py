@@ -1,3 +1,5 @@
+import os
+from pickle import load
 import token
 
 from rest_framework import serializers
@@ -13,6 +15,8 @@ from django.core.mail import send_mail
 
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.password_validation import validate_password
+
+load.dotenv()  # Load environment variables from .env file
 
 
 
@@ -79,7 +83,7 @@ class ForgotPasswordSerializer(serializers.Serializer):
         send_mail(
             subject="Reset Your Password",
             message=f"Click the link to reset your password:\n{reset_link}",
-            from_email=settings.EMAIL_HOST_USER,
+            from_email=os.getenv("EMAIL_HOST_USER"),
             recipient_list=[self.user.email],
         )
 
